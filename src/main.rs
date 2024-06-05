@@ -3,6 +3,8 @@ use dotenvy::var;
 use opentelemetry::global::{set_text_map_propagator, shutdown_tracer_provider};
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
+use std::time::Duration;
+use tokio::time::sleep;
 use tracing::{instrument, Instrument};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
@@ -36,17 +38,24 @@ pub fn configure_tracing(level: String) -> Result<()> {
 }
 
 #[instrument]
-pub async fn my_function() {}
+pub async fn my_function() {
+    sleep(Duration::from_millis(20)).await;
+}
 
 #[instrument]
 pub async fn some_function() {
+    sleep(Duration::from_millis(50)).await;
     my_function().await;
+    sleep(Duration::from_millis(150)).await;
     another_function().await;
+    sleep(Duration::from_millis(200)).await;
 }
 
 #[instrument]
 pub async fn another_function() {
+    sleep(Duration::from_millis(30)).await;
     my_function().await;
+    sleep(Duration::from_millis(70)).await;
 }
 
 #[tokio::main]
